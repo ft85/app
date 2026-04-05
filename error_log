@@ -1,0 +1,1 @@
+[12-Jun-2025 08:30:35 Africa/Bujumbura] PHP Fatal error:  Cannot redeclare accounting() (previously declared in /home/mucoshop/burundi.mucoshop.com/Modules/Accounting/Helpers/general_helper.php:10) in /home/mucoshop/burundi.mucoshop.com/Modules/Accounting/Helpers/general_helper.php on line 11

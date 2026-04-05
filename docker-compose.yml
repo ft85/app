@@ -1,0 +1,84 @@
+
+services:
+    # PHP-FPM Service
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: ultimate-pos-app
+        restart: unless-stopped
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+            - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+        networks:
+            - ultimate-pos-network
+
+    # Nginx Service
+    webserver:
+        image: nginx:alpine
+        container_name: ultimate-pos-nginx
+        restart: unless-stopped
+        ports:
+            - "8083:80"
+        volumes:
+            - ./:/var/www
+            - ./nginx/conf.d:/etc/nginx/conf.d
+        networks:
+            - ultimate-pos-network
+        depends_on:
+            - app
+
+    # MySQL Service
+    db:
+        image: mysql:8.0
+        container_name: ultimate-pos-db
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: app_all
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+        ports:
+            - "3306:3306"
+        volumes:
+            - dbdata:/var/lib/mysql
+        networks:
+            - ultimate-pos-network
+
+    # Redis Service (Optional - for caching and sessions)
+    redis:
+        image: redis:alpine
+        container_name: ultimate-pos-redis
+        restart: unless-stopped
+        ports:
+            - "6380:6379"
+        volumes:
+            - redisdata:/data
+        networks:
+            - ultimate-pos-network
+
+    # PhpMyAdmin Service (Optional - for database management)
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: ultimate-pos-phpmyadmin
+        restart: unless-stopped
+        ports:
+            - "8082:80"
+        environment:
+            PMA_HOST: db
+            PMA_USER: root
+            PMA_PASSWORD: root
+        networks:
+            - ultimate-pos-network
+        depends_on:
+            - db
+
+networks:
+    ultimate-pos-network:
+        driver: bridge
+
+volumes:
+    dbdata:
+        driver: local
+    redisdata:
+        driver: local

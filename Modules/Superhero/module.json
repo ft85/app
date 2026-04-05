@@ -1,0 +1,11 @@
+{
+    "name": "Superhero",
+    "alias": "superhero",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Superhero\\Providers\\SuperheroServiceProvider"
+    ],
+    "files": []
+}

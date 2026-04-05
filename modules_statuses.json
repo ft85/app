@@ -1,0 +1,23 @@
+{
+    "Essentials": false,
+    "Accounting": true,
+    "AssetManagement": false,
+    "Cms": false,
+    "Connector": false,
+    "Crm": false,
+    "Ecommerce": false,
+    "FieldForce": false,
+    "Manufacturing": false,
+    "ProductCatalogue": false,
+    "Project": false,
+    "Repair": false,
+    "Spreadsheet": false,
+    "Superadmin": true,
+    "Woocommerce": false,
+    "AiAssistance": false,
+    "Hms": true,
+    "InboxReport": false,
+    "CustomDashboard": true,
+    "Rra": false,
+    "Superhero": false
+}
