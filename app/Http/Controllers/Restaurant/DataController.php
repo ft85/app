@@ -106,4 +106,38 @@ class DataController extends Controller
             exit;
         }
     }
+
+    /**
+     * Get list of service staff (for table transfer)
+     */
+    public function getServiceStaff(Request $request)
+    {
+        try {
+            $business_id = $request->session()->get('user.business_id');
+            $exclude_id  = $request->get('exclude_id');
+
+            $service_staff_roles = \Spatie\Permission\Models\Role::where('business_id', $business_id)
+                ->where('is_service_staff', 1)
+                ->pluck('name')
+                ->toArray();
+
+            $query = User::where('business_id', $business_id)
+                ->role($service_staff_roles)
+                ->select('id', 'first_name', 'last_name');
+
+            if ($exclude_id) {
+                $query->where('id', '!=', $exclude_id);
+            }
+
+            $waiters = $query->get()->map(fn($w) => [
+                'id'   => $w->id,
+                'name' => $w->first_name . ' ' . ($w->last_name ?? ''),
+            ]);
+
+            return response()->json($waiters);
+        } catch (\Exception $e) {
+            \Log::error('getServiceStaff error: ' . $e->getMessage());
+            return response()->json([], 500);
+        }
+    }
 }

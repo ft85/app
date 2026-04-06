@@ -2,6 +2,7 @@
 
 namespace App\Restaurant;
 
+use App\Transaction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -9,16 +10,22 @@ class ResTable extends Model
 {
     use SoftDeletes;
 
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
+    protected $guarded = ['id'];
 
     /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array
+     * Most recent transaction on this table (draft or final).
      */
-    protected $guarded = ['id'];
+    public function activeTransaction()
+    {
+        return $this->hasOne(Transaction::class, 'res_table_id')
+            ->latest();
+    }
+
+    /**
+     * Currently assigned waiter
+     */
+    public function assignedWaiter()
+    {
+        return $this->belongsTo(\App\User::class, 'assigned_waiter_id');
+    }
 }

@@ -508,6 +508,16 @@ class SellPosController extends Controller
 
                 $transaction = $this->transactionUtil->createSellTransaction($business_id, $input, $invoice_total, $user_id);
 
+                // Track table occupancy via is_table_open flag
+                if (!empty($input['res_table_id'])) {
+                    $tableOpen = ($input['status'] === 'final') ? 0 : 1;
+                    \App\Restaurant\ResTable::where('id', $input['res_table_id'])
+                        ->update([
+                            'is_table_open'      => $tableOpen,
+                            'assigned_waiter_id' => $tableOpen ? ($input['res_waiter_id'] ?? null) : null,
+                        ]);
+                }
+
                 //Upload Shipping documents
                 Media::uploadMedia($business_id, $transaction, $request, 'shipping_documents', false, 'shipping_document');
 
@@ -1442,6 +1452,16 @@ class SellPosController extends Controller
                 DB::beginTransaction();
 
                 $transaction = $this->transactionUtil->updateSellTransaction($id, $business_id, $input, $invoice_total, $user_id);
+
+                // Auto-release table on payment finalization
+                if (!empty($transaction->res_table_id)) {
+                    $tableOpen = ($transaction->status === 'final') ? 0 : 1;
+                    \App\Restaurant\ResTable::where('id', $transaction->res_table_id)
+                        ->update([
+                            'is_table_open'      => $tableOpen,
+                            'assigned_waiter_id' => $tableOpen ? $transaction->res_waiter_id : null,
+                        ]);
+                }
 
                 //update service staff timer
                 if (!$is_direct_sale && $transaction->status == 'final') {

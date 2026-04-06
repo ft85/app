@@ -204,4 +204,188 @@ class TableController extends Controller
             return $output;
         }
     }
+
+    /**
+     * Returns tables categorized by availability for the selected waiter (table dashboard modal)
+     */
+    public function getTableStatus(Request $request)
+    {
+        $business_id = $request->session()->get('user.business_id');
+        $location_id = $request->get('location_id');
+        $selected_waiter_id = $request->get('selected_waiter_id');
+
+        if (!$location_id) {
+            return response()->json(['success' => false, 'msg' => 'Location ID is required'], 400);
+        }
+
+        $location = \App\BusinessLocation::find($location_id);
+
+        $tables = ResTable::where('business_id', $business_id)
+            ->where('location_id', $location_id)
+            ->with(['activeTransaction', 'activeTransaction.service_staff'])
+            ->orderBy('name')
+            ->get();
+
+        $table_data = [];
+        $summary = ['total' => 0, 'available' => 0, 'occupied' => 0];
+
+        foreach ($tables as $table) {
+            $summary['total']++;
+            $data = ['id' => $table->id, 'name' => $table->name, 'is_disabled' => false, 'transaction_id' => null];
+
+            // Table is occupied as long as is_table_open = 1 (explicit close required)
+            if ($table->is_table_open) {
+                $transaction = $table->activeTransaction;
+                $waiter      = $transaction ? $transaction->service_staff : null;
+                $data['status']            = 'occupied';
+                $data['waiter_name']       = $waiter ? ($waiter->first_name . ' ' . ($waiter->last_name ?? '')) : 'Unknown';
+                $data['assigned_waiter_id']= $transaction ? $transaction->res_waiter_id : null;
+                $data['time_elapsed']      = $transaction ? $this->getTimeElapsed($transaction->transaction_date) : '';
+                $data['transaction_id']    = $transaction ? $transaction->id : null;
+                $data['is_paid']           = $transaction && $transaction->status === 'final';
+                $summary['occupied']++;
+            } else {
+                $data['status'] = 'available';
+                $summary['available']++;
+            }
+
+            $table_data[] = $data;
+        }
+
+        return response()->json([
+            'success' => true,
+            'tables' => $table_data,
+            'summary' => $summary,
+            'location_name' => $location->name ?? '',
+        ]);
+    }
+
+    private function getTimeElapsed($transaction_date)
+    {
+        $start = \Carbon\Carbon::parse($transaction_date);
+        $diff  = $start->diff(\Carbon\Carbon::now());
+        return $diff->h > 0 ? $diff->h . 'h ' . $diff->i . 'm' : $diff->i . ' min';
+    }
+
+    /**
+     * Load items of an existing draft table order into the POS cart
+     */
+    public function loadTableOrder(Request $request, $transaction_id)
+    {
+        $business_id = $request->session()->get('user.business_id');
+
+        $transaction = \App\Transaction::where('id', $transaction_id)
+            ->where('business_id', $business_id)
+            ->where('status', 'draft')
+            ->with('sell_lines.product')
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['success' => false, 'msg' => 'Transaction not found or already completed']);
+        }
+
+        $items = [];
+        foreach ($transaction->sell_lines as $line) {
+            if (!empty($line->parent_sell_line_id)) continue;
+            $items[] = [
+                'product_id'               => $line->product_id,
+                'product_name'             => $line->product->name ?? 'Unknown',
+                'variation_id'             => $line->variation_id,
+                'quantity'                 => $line->quantity,
+                'unit_price'               => $line->unit_price_inc_tax,
+                'subtotal'                 => $line->quantity * $line->unit_price_inc_tax,
+                'line_discount_amount'     => $line->line_discount_amount ?? 0,
+                'item_tax'                 => $line->item_tax ?? 0,
+                'transaction_sell_lines_id'=> $line->id,
+                'sell_line_note'           => $line->sell_line_note ?? '',
+                'line_discount_type'       => $line->line_discount_type ?? 'fixed',
+                'tax_id'                   => $line->tax_id ?? null,
+            ];
+        }
+
+        return response()->json([
+            'success'        => true,
+            'items'          => $items,
+            'transaction_id' => $transaction->id,
+            'total'          => $transaction->final_total ?? 0,
+        ]);
+    }
+
+    /**
+     * Explicitly close/release a table (called by staff when customers leave)
+     */
+    public function closeTable(Request $request)
+    {
+        try {
+            $business_id = $request->session()->get('user.business_id');
+            $table_id    = $request->input('table_id');
+
+            $table = ResTable::where('id', $table_id)
+                ->where('business_id', $business_id)
+                ->first();
+
+            if (!$table) {
+                return response()->json(['success' => false, 'msg' => 'Table not found'], 404);
+            }
+
+            $table->update(['is_table_open' => 0, 'assigned_waiter_id' => null]);
+
+            return response()->json(['success' => true, 'msg' => 'Table closed successfully']);
+
+        } catch (\Exception $e) {
+            \Log::error('closeTable error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'msg' => 'Error closing table'], 500);
+        }
+    }
+
+    /**
+     * Transfer a table from one waiter to another
+     */
+    public function transferTable(Request $request)
+    {
+        try {
+            $business_id    = $request->session()->get('user.business_id');
+            $table_id       = $request->input('table_id');
+            $transaction_id = $request->input('transaction_id');
+            $from_waiter_id = $request->input('from_waiter_id');
+            $to_waiter_id   = $request->input('to_waiter_id');
+
+            if (!$table_id || !$transaction_id || !$from_waiter_id || !$to_waiter_id) {
+                return response()->json(['success' => false, 'msg' => 'Missing required parameters'], 400);
+            }
+
+            $transaction = \App\Transaction::where('id', $transaction_id)
+                ->where('business_id', $business_id)
+                ->where('res_table_id', $table_id)
+                ->where('res_waiter_id', $from_waiter_id)
+                ->where('status', 'draft')
+                ->first();
+
+            if (!$transaction) {
+                return response()->json(['success' => false, 'msg' => 'Transaction not found or not authorized'], 403);
+            }
+
+            $to_waiter = \App\User::where('id', $to_waiter_id)->where('business_id', $business_id)->first();
+            if (!$to_waiter) {
+                return response()->json(['success' => false, 'msg' => 'Target service staff not found'], 404);
+            }
+
+            \DB::beginTransaction();
+            $transaction->update(['res_waiter_id' => $to_waiter_id]);
+            \App\TransactionSellLine::where('transaction_id', $transaction_id)
+                ->where(function ($q) {
+                    $q->where('res_line_order_status', '!=', 'served')->orWhereNull('res_line_order_status');
+                })
+                ->update(['res_service_staff_id' => $to_waiter_id]);
+            ResTable::where('id', $table_id)->update(['assigned_waiter_id' => $to_waiter_id]);
+            \DB::commit();
+
+            return response()->json(['success' => true, 'msg' => 'Table transferred successfully']);
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('transferTable error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'msg' => 'Error transferring table'], 500);
+        }
+    }
 }

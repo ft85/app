@@ -1,36 +1,33 @@
-@if($tables_enabled)
-<div class="col-sm-4">
-	<div class="form-group">
-		<div class="input-group">
-			<span class="input-group-addon">
-				<i class="fa fa-table"></i>
-			</span>
-			{!! Form::select('res_table_id', $tables, $view_data['res_table_id'], ['class' => 'form-control', 'placeholder' => __('restaurant.select_table')]); !!}
-		</div>
-	</div>
-</div>
-@endif
-@if($waiters_enabled)
-<div class="col-sm-4">
-	<div class="form-group">
-		<div class="input-group">
-			<span class="input-group-addon">
-				<i class="fa fa-user-secret"></i>
-			</span>
-			<select class="form-control" name="res_waiter_id" id="res_waiter_id" @if ($is_service_staff_required) 
-			required
-			@endif>
-				<option selected value="">{{ __('restaurant.select_service_staff') }}</option>
-				 @foreach ($waiters as $waiter)
-					<option {{ $waiter->id == $view_data['res_waiter_id'] ? 'selected' : ''; }} value="{{ $waiter->id }}" data-is_enable="{{ $waiter->is_enable_service_staff_pin }}">{{ $waiter->first_name .  $waiter->last_name}}</option>
-				 @endforeach
-			</select>
-			@if(!empty($pos_settings['inline_service_staff']))
-			<div class="input-group-btn">
-                <button type="button" class="btn btn-default bg-white btn-flat" id="select_all_service_staff" data-toggle="tooltip" title="@lang('lang_v1.select_same_for_all_rows')"><i class="fa fa-check"></i></button>
+@if($tables_enabled || $waiters_enabled)
+<div class="col-md-4">
+    <div class="form-group">
+        <div class="input-group">
+            <input type="text"
+                   class="form-control"
+                   id="table_waiter_display"
+                   placeholder="Not selected"
+                   readonly
+                   style="background: white; cursor: pointer;"
+                   title="Click to select table and waiter">
+
+            {{-- Hidden fields used by existing POS JS --}}
+            <input type="hidden" name="res_table_id" id="res_table_id"
+                   value="{{ $view_data['res_table_id'] ?? '' }}">
+            <input type="hidden" name="res_waiter_id" id="res_waiter_id"
+                   value="{{ $view_data['res_waiter_id'] ?? '' }}">
+
+            <div class="input-group-btn">
+                <button type="button"
+                        class="btn btn-info"
+                        id="view_all_tables_btn"
+                        title="View All Tables">
+                    <i class="fa fa-th"></i> Tables
+                </button>
             </div>
-            @endif
-		</div>
-	</div>
+        </div>
+        <small class="text-muted" id="table_hint">
+            <i class="fa fa-info-circle"></i> Click to select table and waiter
+        </small>
+    </div>
 </div>
 @endif

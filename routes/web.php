@@ -537,6 +537,11 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
         Route::get('/orders/mark-as-served/{id}', [Restaurant\OrderController::class, 'markAsServed']);
         Route::get('/data/get-pos-details', [Restaurant\DataController::class, 'getPosDetails']);
         Route::get('/data/check-staff-pin', [Restaurant\DataController::class, 'checkStaffPin']);
+        Route::get('/data/get-service-staff', [Restaurant\DataController::class, 'getServiceStaff']);
+        Route::get('/restaurant/tables/status', [Restaurant\TableController::class, 'getTableStatus']);
+        Route::post('/restaurant/tables/transfer', [Restaurant\TableController::class, 'transferTable']);
+        Route::post('/restaurant/tables/close', [Restaurant\TableController::class, 'closeTable']);
+        Route::get('/pos/load-table-order/{transaction_id}', [Restaurant\TableController::class, 'loadTableOrder']);
         Route::get('/orders/mark-line-order-as-served/{id}', [Restaurant\OrderController::class, 'markLineOrderAsServed']);
         Route::get('/print-line-order', [Restaurant\OrderController::class, 'printLineOrder']);
 

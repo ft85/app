@@ -96,6 +96,11 @@
 
     @include('sale_pos.partials.weighing_scale_modal')
 
+    {{-- Table Dashboard Modal --}}
+    @if(in_array('tables', $enabled_modules) || in_array('service_staff', $enabled_modules))
+        @include('restaurant.partials.table_status_modal')
+    @endif
+
 @stop
 @section('css')
 @if (!empty($pos_module_data))
@@ -127,5 +132,30 @@
                 @includeIf($value['module_js_path'], ['view_data' => $value['view_data']])
             @endif
         @endforeach
+    @endif
+
+    @if(in_array('tables', $enabled_modules) || in_array('service_staff', $enabled_modules))
+    <script>
+    $(document).ready(function() {
+        // Use event delegation — #view_all_tables_btn is injected dynamically by restaurant.js AJAX
+        $(document).on('click', '#view_all_tables_btn', function() {
+            $('#table_status_modal').modal('show');
+        });
+        $(document).on('click', '#table_waiter_display', function() {
+            $('#table_status_modal').modal('show');
+        });
+
+        // Clear table selection whenever the POS form is reset
+        // (after Draft, Quotation, Suspend, Cash, or any payment finalization)
+        $(document).on('sell_form_reset', function() {
+            $('#res_table_id').val('');
+            $('#res_waiter_id').val('');
+            $('#table_waiter_display').val('');
+            $('#table_hint').html(
+                '<i class="fa fa-info-circle"></i> Click to select table and waiter'
+            );
+        });
+    });
+    </script>
     @endif
 @endsection
