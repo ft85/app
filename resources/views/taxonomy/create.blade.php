@@ -31,8 +31,7 @@
         'placeholder' => __('messages.select_item_code'),
         'class' => 'form-control select2',
         'style' => 'width: 100%;',
-        'data-minimum-input-length' => 2, // Set minimum input length to 1 character
-        'required' => 'required',
+        'data-minimum-input-length' => 0,
         ]) !!}
       </div>
       <!-- Add Printer Field -->

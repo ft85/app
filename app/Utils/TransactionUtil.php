@@ -147,8 +147,8 @@ class TransactionUtil extends Util
                 $discount_amount = $item['line_discount_amount'];
                 $tax_id = $item['tax_id'];
                 $tax_details = TaxRate::find($tax_id);
-                $taxname = $tax_details['name'];
-                $taxrate = $tax_details['amount'];
+                $taxname = $tax_details ? $tax_details['name'] : '';
+                $taxrate = $tax_details ? $tax_details['amount'] : 0;
 
                 $item_tax_with_comma = $item['item_tax'];
 
@@ -641,8 +641,8 @@ class TransactionUtil extends Util
                 $discount_amount = $item['line_discount_amount'];
                 $tax_id = $item['tax_id'];
                 $tax_details = TaxRate::find($tax_id);
-                $taxname = $tax_details['name'];
-                $taxrate = $tax_details['amount'];
+                $taxname = $tax_details ? $tax_details['name'] : '';
+                $taxrate = $tax_details ? $tax_details['amount'] : 0;
 
                 $item_tax_with_comma = $item['item_tax'];
                 $itemtax_without_comma = str_replace(',', '', $item_tax_with_comma);

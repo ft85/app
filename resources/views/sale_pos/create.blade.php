@@ -26,7 +26,7 @@
                     {{-- <div class="@if (empty($pos_settings['hide_product_suggestion'])) col-md-7 @else col-md-10 col-md-offset-1 @endif no-padding pr-12"> --}}
                     <div class="tw-px-3 tw-w-full lg:tw-w-[60%] lg:tw-px-0 lg:tw-pr-0">
 
-                        <div class="tw-shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px] tw-rounded-2xl tw-bg-white tw-mb-2 md:tw-mb-8 tw-p-2">
+                        <div id="pos-main-card" class="tw-shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px] tw-rounded-2xl tw-bg-white tw-mb-2 md:tw-mb-8 tw-p-2">
 
                             {{-- <div class="box box-solid mb-12 @if (!isMobile()) mb-40 @endif"> --}}
                                 <div class="box-body pb-0">
@@ -98,14 +98,14 @@
 
 @stop
 @section('css')
-    <!-- include module css -->
-    @if (!empty($pos_module_data))
-        @foreach ($pos_module_data as $key => $value)
-            @if (!empty($value['module_css_path']))
-                @includeIf($value['module_css_path'])
-            @endif
-        @endforeach
-    @endif
+@if (!empty($pos_module_data))
+    @foreach ($pos_module_data as $key => $value)
+        @if (!empty($value['module_css_path']))
+            @includeIf($value['module_css_path'])
+        @endif
+    @endforeach
+@endif
+<link rel="stylesheet" href="{{ asset('css/pos-premium.css') }}?v={{ $asset_v }}">
 @stop
 @section('javascript')
     <script src="{{ asset('js/pos.js?v=' . $asset_v) }}"></script>

@@ -16,11 +16,12 @@ class Unspec extends Model
      */
     public static function forDropdown()
     {
-        $unspec = Unspec::orderBy('item_class', 'asc')->get();
-
-        $dropdown = $unspec->pluck('item_class', 'unspec_code');
-
-        return $dropdown;
+        try {
+            $unspec = Unspec::orderBy('item_class', 'asc')->get();
+            return $unspec->pluck('item_class', 'unspec_code');
+        } catch (\Exception $e) {
+            return collect();
+        }
     }
 
 

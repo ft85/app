@@ -13,20 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            //
-        });
+        if (!Schema::hasColumn('products', 'injonge_code')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->string('injonge_code')->nullable()->after('sku');
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasColumn('products', 'injonge_code')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->dropColumn('injonge_code');
+            });
+        }
     }
 };

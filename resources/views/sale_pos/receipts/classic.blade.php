@@ -26,50 +26,54 @@
       <div id="project">
         <div><strong>A. Identification du vendeur</strong></div>
         <div>Nom et prénom ou Raison sociale :
-     
-          {{$receipt_details->nameBusiness}}
-
+          {{ $receipt_details->business_name ?? $receipt_details->display_name ?? ‘’ }}
         </div>
-        <div>NIF : 
+        <div>NIF :
         @if(!empty($receipt_details->tax_info1))
         {{ $receipt_details->tax_info1 }}
         @endif
         </div>
-        <div>Registre de Commerce N°{{ $receipt_details->registre_commerce }}</div>
+        <div>Registre de Commerce N°{{ $receipt_details->registre_commerce ?? ‘’ }}</div>
         <div>Address :
-        {!! $receipt_details->address !!}
-        </div> 
-        <div>Centre fiscal : {{ $receipt_details->centre_fiscal }}</div> 
-        <div>Secteur  d’activités : {{ $receipt_details->secteur }} </div>
-        <div>Forme juridique: {{ $receipt_details->forme }}</div> 
+        {!! $receipt_details->address ?? ‘’ !!}
+        </div>
+        <div>Centre fiscal : {{ $receipt_details->centre_fiscal ?? ‘’ }}</div>
+        <div>Secteur  d’activités : {{ $receipt_details->secteur ?? ‘’ }} </div>
+        <div>Forme juridique: {{ $receipt_details->forme ?? ‘’ }}</div>
+@php
+    $tva_payer  = $receipt_details->tva_payer  ?? ‘0’;
+    $tc_payer   = $receipt_details->tc_payer   ?? ‘0’;
+    $pfa_payer  = $receipt_details->pfa_payer  ?? ‘0’;
+@endphp
 <div>Assujetti à la TVA :
-    <input type="checkbox" id="TVA" name="TVA" {{ $receipt_details->tva_payer == '1' ? 'checked' : '' }}> 
+    <input type="checkbox" id="TVA" name="TVA" {{ $tva_payer == ‘1’ ? ‘checked’ : ‘’ }}>
     <label for="TVA">Oui</label>
-    <input type="checkbox" id="HTVA" name="HTVA" {{ $receipt_details->tva_payer != '1' ? 'checked' : '' }}> 
+    <input type="checkbox" id="HTVA" name="HTVA" {{ $tva_payer != ‘1’ ? ‘checked’ : ‘’ }}>
     <label for="HTVA">Non</label>
 </div>
-<div> Assujetti à la TC :  
-    <input type="checkbox" id="TVA" name="TVA" {{ $receipt_details->tc_payer == '1' ? 'checked' : '' }}> 
+<div> Assujetti à la TC :
+    <input type="checkbox" id="TVA" name="TVA" {{ $tc_payer == ‘1’ ? ‘checked’ : ‘’ }}>
     <label for="TVA">Oui</label>
-    <input type="checkbox" id="HTVA" name="HTVA" {{ $receipt_details->tc_payer != '1' ? 'checked' : '' }}> 
+    <input type="checkbox" id="HTVA" name="HTVA" {{ $tc_payer != ‘1’ ? ‘checked’ : ‘’ }}>
     <label for="HTVA">Non</label>
 </div>
 <div>Assujetti à la PFA :
-    <input type="checkbox" id="TVA" name="TVA" {{ $receipt_details->pfa_payer == '1' ? 'checked' : '' }}> 
+    <input type="checkbox" id="TVA" name="TVA" {{ $pfa_payer == ‘1’ ? ‘checked’ : ‘’ }}>
     <label for="TVA">Oui</label>
-    <input type="checkbox" id="HTVA" name="HTVA" {{ $receipt_details->pfa_payer != '1' ? 'checked' : '' }}> 
+    <input type="checkbox" id="HTVA" name="HTVA" {{ $pfa_payer != ‘1’ ? ‘checked’ : ‘’ }}>
     <label for="HTVA">Non</label>
 </div>
 	  </div>
       <div id="company" class="clearfix">
         <div><strong>B. Client</strong></div>
         <div>Nom et prénom ou raison sociale : {!! $receipt_details->customer_name !!}</div>
-        <div>NIF:{{ $receipt_details->customer_tax_number }}</div>
+        <div>NIF:{{ $receipt_details->customer_tax_number ?? '' }}</div>
+        @php $customer_vat = $receipt_details->customer_vat ?? '0'; @endphp
         <div>Assujetti à la TVA :
-        <input type="checkbox" id="TVA" name="TVA" {{ $receipt_details->customer_vat == '1' ? 'checked' : '' }}> 
-        <label for="TVA">Oui</label>
-        <input type="checkbox" id="HTVA" name="HTVA" {{ $receipt_details->customer_vat != '1' ? 'checked' : '' }}> 
-        <label for="HTVA">Non</label>
+        <input type="checkbox" id="TVA_c" name="TVA_c" {{ $customer_vat == '1' ? 'checked' : '' }}>
+        <label for="TVA_c">Oui</label>
+        <input type="checkbox" id="HTVA_c" name="HTVA_c" {{ $customer_vat != '1' ? 'checked' : '' }}>
+        <label for="HTVA_c">Non</label>
         </div>
       </div>
     </header>
@@ -435,10 +439,12 @@
           </div>
       </div>
       @endif
+    @if(!empty($receipt_details->rcptsign))
     <div class="obr">
     OBR ID </br>
     {!! $receipt_details->rcptsign !!}
     </div>
+    @endif
     </main>
     @if(!empty($receipt_details->signature))
     <main class="row" style="margin:10px;">

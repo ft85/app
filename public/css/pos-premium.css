@@ -1,0 +1,430 @@
+/* =========================================================
+   I-SOLUTIONS POS — PREMIUM INTERFACE  v2.0
+   File: public/css/pos-premium.css
+   All selectors use safe IDs, element tags, and simple
+   class names — NO escaped Tailwind utility selectors.
+========================================================= */
+
+/* ── Variables ─────────────────────────────────────────── */
+:root {
+    --p-navy:    #001f3e;
+    --p-navy2:   #0d2d52;
+    --p-green:   #28b77b;
+    --p-green2:  #1da066;
+    --p-blue:    #646ee4;
+    --p-red:     #ef4b51;
+    --p-amber:   #e7a500;
+    --p-purple:  #5e5ca8;
+    --p-bg:      #f0f4f8;
+    --p-surface: #ffffff;
+    --p-border:  #e2e8f0;
+    --p-text:    #0f172a;
+    --p-muted:   #64748b;
+    --p-shadow:  0 1px 4px rgba(0,0,0,.06), 0 4px 18px rgba(0,0,0,.07);
+}
+
+/* ── Reset lockscreen dark background ─────────────────── */
+body.lockscreen,
+body.lockscreen .wrapper,
+body.lockscreen .content-wrapper {
+    background: var(--p-bg) !important;
+}
+
+/* ── Main page bg ──────────────────────────────────────── */
+.content.no-print {
+    background: var(--p-bg) !important;
+    padding: 12px 12px 100px !important;
+    min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LEFT PANEL — FORM CARD
+======================================================= */
+#pos-main-card {
+    background: var(--p-surface) !important;
+    border-radius: 14px !important;
+    box-shadow: var(--p-shadow) !important;
+    border: 1px solid var(--p-border) !important;
+    overflow: hidden;
+    margin-bottom: 16px !important;
+    padding: 0 !important;
+}
+
+#pos-main-card .box-body {
+    padding: 16px 20px 4px !important;
+}
+
+/* ── Customer / date / location inputs inside card ─────── */
+#pos-main-card .form-control {
+    border-radius: 8px !important;
+    border: 1.5px solid var(--p-border) !important;
+    background: #f8fafc !important;
+    color: var(--p-text) !important;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    font-size: 0.875rem;
+}
+#pos-main-card .form-control:focus {
+    border-color: var(--p-blue) !important;
+    box-shadow: 0 0 0 3px rgba(100,110,228,0.13) !important;
+    background: #fff !important;
+    outline: none;
+}
+#pos-main-card .input-group-addon,
+#pos-main-card .input-group-btn .btn {
+    background: #f1f5f9 !important;
+    border-color: var(--p-border) !important;
+    color: var(--p-muted) !important;
+    border-radius: 8px 0 0 8px !important;
+}
+
+/* ── Select2 inside card ───────────────────────────────── */
+#pos-main-card .select2-container--default .select2-selection--single {
+    border-radius: 8px !important;
+    border: 1.5px solid var(--p-border) !important;
+    background: #f8fafc !important;
+    height: 34px !important;
+    display: flex;
+    align-items: center;
+}
+#pos-main-card .select2-selection__rendered { color: var(--p-text) !important; }
+#pos-main-card .select2-selection__placeholder { color: var(--p-muted) !important; }
+
+/* ═══════════════════════════════════════════════════════
+   PRODUCT TABLE  (#pos_table)
+======================================================= */
+#pos_table {
+    border-collapse: collapse !important;
+    border: none !important;
+    margin: 0 !important;
+    width: 100%;
+}
+
+#pos_table thead tr {
+    background: var(--p-navy) !important;
+}
+
+#pos_table thead th {
+    background: var(--p-navy) !important;
+    color: rgba(255,255,255,0.82) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.7px !important;
+    padding: 12px 12px !important;
+    border: none !important;
+    white-space: nowrap;
+}
+
+#pos_table tbody tr {
+    background: #fff;
+    transition: background 0.12s;
+}
+#pos_table tbody tr:nth-child(even) { background: #f8fafc; }
+#pos_table tbody tr:hover { background: #f0fdf4 !important; }
+
+#pos_table tbody td {
+    border-top: 1px solid #f1f5f9 !important;
+    padding: 9px 12px !important;
+    vertical-align: middle !important;
+    font-size: 0.875rem;
+    color: var(--p-text);
+}
+
+#pos_table .product-description { font-weight: 600; color: var(--p-navy); }
+
+/* Qty input */
+#pos_table input.input_number {
+    border-radius: 6px !important;
+    border: 1.5px solid var(--p-border) !important;
+    text-align: center;
+    font-weight: 700;
+    color: var(--p-text);
+    background: #f8fafc !important;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    min-width: 52px;
+    padding: 4px 6px !important;
+}
+#pos_table input.input_number:focus {
+    border-color: var(--p-green) !important;
+    box-shadow: 0 0 0 3px rgba(40,183,123,0.14) !important;
+    background: #fff !important;
+    outline: none;
+}
+
+/* Delete row button */
+#pos_table .remove_product_row {
+    color: var(--p-red) !important;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+}
+#pos_table .remove_product_row:hover { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════
+   TOTALS STRIP  (.pos_form_totals)
+======================================================= */
+.pos_form_totals {
+    background: #fff !important;
+    border-top: 2px solid var(--p-border) !important;
+    border-radius: 0 0 14px 14px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.pos_form_totals > .col-md-12 { padding: 0 !important; }
+
+.pos_form_totals .table {
+    margin: 0 !important;
+    background: transparent !important;
+}
+
+.pos_form_totals .table td {
+    border: none !important;
+    padding: 10px 18px !important;
+    color: var(--p-text) !important;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.pos_form_totals .table td b {
+    color: var(--p-muted) !important;
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.pos_form_totals .table td span {
+    color: var(--p-navy) !important;
+    font-weight: 700;
+}
+
+.pos_form_totals .fa-edit,
+.pos_form_totals .fas.fa-edit {
+    color: var(--p-green) !important;
+    cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FIXED BOTTOM ACTION BAR  (.pos-form-actions)
+======================================================= */
+.pos-form-actions {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1050 !important;
+    background: var(--p-navy) !important;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.18) !important;
+    border-top: 2px solid rgba(255,255,255,0.07) !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+}
+
+.pos-form-actions > .row { margin: 0 !important; }
+
+.pos-form-actions > div > div {
+    padding: 8px 16px !important;
+    gap: 8px;
+}
+
+/* Total payable box */
+.pos-total {
+    background: rgba(40,183,123,0.12) !important;
+    border: 1.5px solid rgba(40,183,123,0.35) !important;
+    border-radius: 10px !important;
+    padding: 6px 16px !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pos-total #total_payable {
+    color: #4ade80 !important;
+    font-size: 1.5rem !important;
+    font-weight: 900 !important;
+}
+
+.pos-total div,
+.pos-total span.tw-text-black {
+    color: rgba(255,255,255,0.7) !important;
+    font-size: 0.72rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+/* Checkout / express buttons (already have inline Tailwind bg; just enhance) */
+#pos-finalize {
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.3px !important;
+    transition: transform 0.15s, box-shadow 0.15s !important;
+}
+#pos-finalize:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(0,31,62,0.4) !important;
+}
+
+/* Cancel / delete */
+#pos-cancel, #pos-delete {
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    transition: transform 0.15s, box-shadow 0.15s !important;
+}
+#pos-cancel:hover, #pos-delete:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 14px rgba(239,75,81,0.4) !important;
+}
+
+/* Icon-only action buttons (draft, quotation, suspend, credit, card) */
+#pos-draft, #pos-quotation {
+    color: rgba(255,255,255,0.85) !important;
+    border-radius: 8px !important;
+    padding: 5px 10px !important;
+    transition: background 0.15s !important;
+}
+#pos-draft:hover, #pos-quotation:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+/* Recent transactions button */
+#recent-transactions {
+    transition: transform 0.15s, box-shadow 0.15s !important;
+}
+#recent-transactions:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(100,110,228,0.45) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RIGHT SIDEBAR — PRODUCT PANEL
+======================================================= */
+/* Search product input */
+#search_product {
+    border-radius: 8px !important;
+    border: 1.5px solid var(--p-border) !important;
+    background: #f8fafc !important;
+    color: var(--p-text) !important;
+    font-size: 0.875rem;
+    transition: border-color 0.18s, box-shadow 0.18s;
+}
+#search_product:focus {
+    border-color: var(--p-green) !important;
+    box-shadow: 0 0 0 3px rgba(40,183,123,0.14) !important;
+    background: #fff !important;
+    outline: none;
+}
+
+/* Product card hover lift */
+.tw-dw-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+.tw-dw-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Product list items */
+#product_list .product-list-item {
+    border-radius: 10px !important;
+    overflow: hidden;
+    transition: transform 0.15s ease !important;
+}
+#product_list .product-list-item:hover {
+    transform: translateY(-2px) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MODALS — PAYMENT & OTHERS
+======================================================= */
+.modal-content {
+    border-radius: 16px !important;
+    border: none !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.22) !important;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: var(--p-navy) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    padding: 16px 22px !important;
+}
+
+.modal-header .modal-title,
+.modal-header h4 {
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+}
+
+.modal-header .close {
+    color: rgba(255,255,255,0.65) !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+    font-size: 1.4rem;
+    transition: color 0.15s;
+}
+.modal-header .close:hover { color: #fff !important; }
+
+.modal-footer {
+    border-top: 1px solid var(--p-border) !important;
+    padding: 12px 22px !important;
+    background: #f8fafc !important;
+}
+
+/* Payment submit button */
+#submit_payment_form {
+    background: linear-gradient(135deg, var(--p-green), var(--p-green2)) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    padding: 10px 28px !important;
+    font-size: 0.88rem !important;
+    box-shadow: 0 4px 14px rgba(40,183,123,0.35) !important;
+    transition: transform 0.15s, box-shadow 0.15s !important;
+    color: #fff !important;
+}
+#submit_payment_form:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(40,183,123,0.5) !important;
+}
+
+/* Payment type tabs */
+.payment_modal .nav-tabs {
+    border-color: var(--p-border) !important;
+}
+.payment_modal .nav-tabs > li.active > a,
+.payment_modal .nav-tabs > li.active > a:hover {
+    background: var(--p-navy) !important;
+    border-color: var(--p-navy) !important;
+    color: #fff !important;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+/* Payment input fields */
+.payment_row .form-control,
+.payment_type_amount {
+    border-radius: 8px !important;
+    border: 1.5px solid var(--p-border) !important;
+    transition: border-color 0.18s, box-shadow 0.18s;
+}
+.payment_row .form-control:focus,
+.payment_type_amount:focus {
+    border-color: var(--p-green) !important;
+    box-shadow: 0 0 0 3px rgba(40,183,123,0.14) !important;
+    outline: none;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBAR POLISH
+======================================================= */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE — ensure action bar doesn't overlap content
+======================================================= */
+@media (max-width: 768px) {
+    .content.no-print { padding-bottom: 130px !important; }
+}
