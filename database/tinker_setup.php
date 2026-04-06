@@ -23,14 +23,23 @@ if (!Schema::hasTable('unspec')) {
     echo "- unspec table already exists\n";
 }
 
-// ── 2. unspec column on categories ────────────────────────
+// ── 2. unspec + printer_id columns on categories ──────────
 if (!Schema::hasColumn('categories', 'unspec')) {
     Schema::table('categories', function (Blueprint $table) {
-        $table->string('unspec')->nullable()->after('id');
+        $table->string('unspec')->nullable()->after('description');
     });
     echo "✓ unspec column added to categories\n";
 } else {
     echo "- categories.unspec already exists\n";
+}
+
+if (!Schema::hasColumn('categories', 'printer_id')) {
+    Schema::table('categories', function (Blueprint $table) {
+        $table->unsignedInteger('printer_id')->nullable()->after('unspec');
+    });
+    echo "✓ printer_id column added to categories\n";
+} else {
+    echo "- categories.printer_id already exists\n";
 }
 
 // ── 3. Seed OBR item class codes ──────────────────────────
