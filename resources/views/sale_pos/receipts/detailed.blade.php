@@ -4,6 +4,98 @@
   <meta charset="UTF-8">
   <title>Receipt-{{$receipt_details->invoice_no ?? ''}}</title>
   <style>
+    @if(isset($receipt_details->paper_size) && $receipt_details->paper_size == '80mm')
+      body {
+        width: 80mm;
+        max-width: 80mm;
+        margin: 0 auto;
+        font-size: 12px;
+        line-height: 1.2;
+      }
+      .container {
+        width: 100%;
+        max-width: 80mm;
+        padding: 5px;
+      }
+      .title {
+        font-size: 16px;
+        text-align: center;
+        margin: 10px 0;
+      }
+      .info-table {
+        width: 100%;
+        font-size: 11px;
+      }
+      .products-table {
+        width: 100%;
+        font-size: 10px;
+      }
+      .highlight-box {
+        width: 100%;
+        font-size: 11px;
+      }
+    @elseif(isset($receipt_details->paper_size) && $receipt_details->paper_size == '58mm')
+      body {
+        width: 58mm;
+        max-width: 58mm;
+        margin: 0 auto;
+        font-size: 10px;
+        line-height: 1.1;
+      }
+      .container {
+        width: 100%;
+        max-width: 58mm;
+        padding: 3px;
+      }
+      .title {
+        font-size: 14px;
+        text-align: center;
+        margin: 8px 0;
+      }
+      .info-table {
+        width: 100%;
+        font-size: 9px;
+      }
+      .products-table {
+        width: 100%;
+        font-size: 8px;
+      }
+      .highlight-box {
+        width: 100%;
+        font-size: 9px;
+      }
+    @else
+      body {
+        width: 210mm;
+        max-width: 210mm;
+        margin: 0 auto;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+      .container {
+        width: 100%;
+        max-width: 210mm;
+        padding: 20px;
+      }
+      .title {
+        font-size: 24px;
+        text-align: center;
+        margin: 20px 0;
+      }
+      .info-table {
+        width: 100%;
+        font-size: 14px;
+      }
+      .products-table {
+        width: 100%;
+        font-size: 12px;
+      }
+      .highlight-box {
+        width: 100%;
+        font-size: 14px;
+      }
+    @endif
+
     /* CSS Variables for easy customization */
     /* :root {
       --primary-color: #333366;
@@ -823,8 +915,31 @@
           {{$receipt_details->display_name ?? $receipt_details->nameBusiness ?? $receipt_details->business_name ?? 'Votre Entreprise'}}
         </span>
       </div>
+
+      @if(empty($receipt_details->rcptsign))
+      <div class="quotation-info" style="text-align: center; margin-top: 10px; font-size: 11px; color: #666;">
+        @if(!empty($receipt_details->address))
+        <div style="margin-bottom: 5px;">{{$receipt_details->address}}</div>
+        @endif
+
+        @if(!empty($receipt_details->service_staff) || !empty($receipt_details->table))
+        <div style="margin-bottom: 5px;">
+          @if(!empty($receipt_details->service_staff))
+            <span>Waiter: {{$receipt_details->service_staff}}</span>
+          @endif
+          @if(!empty($receipt_details->service_staff) && !empty($receipt_details->table))
+            <span> | </span>
+          @endif
+          @if(!empty($receipt_details->table))
+            <span>Table: {{$receipt_details->table}}</span>
+          @endif
+        </div>
+        @endif
+      </div>
+      @endif
     </div>
 
+    @if(!empty($receipt_details->rcptsign))
     <table class="info-table">
       @if(!empty($receipt_details->tax_info1) || !empty($receipt_details->registre_commerce))
       <tr>
@@ -890,8 +1005,19 @@
 </td>
       </tr>
     </table>
+    @endif
 
-    <div class="title">FACTURE {{!empty($receipt_details->is_paid) ? 'PAYÉE' : ''}}</div>
+    <div class="title">
+        @if(isset($receipt_details->is_quotation) && ($receipt_details->is_quotation == 1 || $receipt_details->is_quotation === "1"))
+            QUOTATION
+        @elseif(isset($receipt_details->payment_status) && ($receipt_details->payment_status == 'due' || $receipt_details->payment_status == 'partial'))
+            FACTURE à Credit
+        @elseif(isset($receipt_details->is_credit_sale) && ($receipt_details->is_credit_sale == 1 || $receipt_details->is_credit_sale === "1"))
+            FACTURE à Credit
+        @else
+            FACTURE {{!empty($receipt_details->is_paid) ? 'PAYÉE' : ''}}
+        @endif
+    </div>
 
     <table class="info-table">
       <tr>
@@ -993,11 +1119,37 @@
         $displayVat = '0.00';
 
         if (($receipt_details->tva_payer ?? '') == '1') {
-            foreach($receipt_details->lines as $line) {
-                $lineTaxAmount = (float) str_replace(',', '', $line['tax'] ?? '0');
-                $lineQuantity = (float) str_replace(',', '', $line['quantity'] ?? '0');
-                $totalVat += ($lineTaxAmount * $lineQuantity);
+            if (!empty($receipt_details->lines)) {
+                foreach($receipt_details->lines as $line) {
+                    $lineTaxAmount = $line['tax'] ?? '0';
+                    $lineTaxAmount = preg_replace('/[^\d.,]/', '', $lineTaxAmount);
+                    $lineTaxAmount = str_replace(',', '', $lineTaxAmount);
+                    $totalVat += (float)$lineTaxAmount;
+                }
             }
+
+            if ($totalVat == 0 && !empty($receipt_details->taxes)) {
+                foreach($receipt_details->taxes as $taxCode => $taxAmount) {
+                    $taxAmount = preg_replace('/[^\d.,]/', '', $taxAmount);
+                    $taxAmount = str_replace(',', '', $taxAmount);
+                    $totalVat += (float)$taxAmount;
+                }
+            }
+
+            if ($totalVat == 0) {
+                $subtotal = $receipt_details->subtotal_exc_tax ?? '0';
+                $subtotal = preg_replace('/[^\d.,]/', '', $subtotal);
+                $subtotal = str_replace(',', '', $subtotal);
+                $subtotal = (float)$subtotal;
+
+                $total = $receipt_details->total ?? '0';
+                $total = preg_replace('/[^\d.,]/', '', $total);
+                $total = str_replace(',', '', $total);
+                $total = (float)$total;
+
+                $totalVat = $total - $subtotal;
+            }
+
             $displayVat = number_format($totalVat, 2);
         }
     @endphp
@@ -1064,8 +1216,7 @@
       @endif
 
       <div class="total-row grand-total">
-       <!-- <span class="total-label">TOTAL TTC:</span>-->
-        <span class="total-value">{{$receipt_details->total ?? '0'}}</span>
+        <span class="total-value">{{ str_replace(['→', '-->', '->'], '', $receipt_details->total ?? '0') }}</span>
       </div>
 
       @if(!empty($receipt_details->total_in_words))
@@ -1105,10 +1256,40 @@
     </div>
     @endif-->
 
-    <div class="footer">
-      <p>Merci pour votre confiance et à bientôt !</p>
-      <p>Powered by <span style="color: var(--primary-color); font-weight: 700;">i-Solutions</span></p>
+    @if(!empty($receipt_details->current_exchange_rate) && $receipt_details->current_exchange_rate > 1)
+    @php
+        $totalBIF = $receipt_details->calculated_total_from_lines ?? 0;
+        $exchangeRate = $receipt_details->current_exchange_rate ?? 1;
+        $totalUSD = $receipt_details->usd_equivalent ?? 0;
+    @endphp
+    <div class="currency-info" style="margin-top: 15px; padding: 10px; border-top: 1px solid #ddd; font-size: 11px;">
+      <div style="text-align: center; font-weight: bold; margin-bottom: 8px;">CURRENCY INFORMATION</div>
+
+      <div style="margin-bottom: 5px;">
+        <strong>Exchange Rate:</strong> 1 USD = {{number_format($exchangeRate, 2)}} BIF
+      </div>
+
+      <div style="margin-bottom: 5px;">
+        <strong>Amount in USD:</strong> ${{number_format($totalUSD, 2)}}
+      </div>
+
+      <div style="font-size: 10px; color: #666; text-align: center; margin-top: 8px;">
+        Rate applied on: {{date('d/m/Y H:i')}}
+      </div>
     </div>
+    @endif
+
+    @if(empty($receipt_details->rcptsign))
+    <div class="footer" style="margin-top: 15px; text-align: center; padding: 15px; border-top: 1px solid #e0e0e0;">
+      <p style="color: #7f8c8d; font-style: italic; margin-bottom: 8px;">{{ str_replace(['→', '-->', '->'], '', 'Thank you for choosing our services!') }}</p>
+      <p style="color: #95a5a6; font-size: 12px;">{{ str_replace(['→', '-->', '->'], '', 'Powered by') }} <span style="color: #3498db; font-weight: 700;">{{ str_replace(['→', '-->', '->'], '', 'i-Solutions') }}</span></p>
+    </div>
+    @else
+    <div class="footer">
+      <p>{{ str_replace(['→', '-->', '->'], '', 'Merci pour votre confiance et à bientôt !') }}</p>
+      <p>{{ str_replace(['→', '-->', '->'], '', 'Powered by') }} <span style="color: var(--primary-color); font-weight: 700;">{{ str_replace(['→', '-->', '->'], '', 'i-Solutions') }}</span></p>
+    </div>
+    @endif
 
     @if(!empty($receipt_details->website))
     <div class="bank-info">
