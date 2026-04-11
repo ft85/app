@@ -146,7 +146,7 @@ class DataController extends Controller
             Menu::modify(
                 'admin-sidebar-menu',
                 function ($menu) {
-                    $menu->url(action([\Modules\Crm\Http\Controllers\CrmDashboardController::class, 'index']), __('crm::lang.crm'), ['icon' => 'fas fa fa-broadcast-tower', 'style' => config('app.env') == 'demo' ? 'background-color: #8CAFD4;' : '', 'active' => request()->segment(1) == 'crm' || request()->get('type') == 'life_stage' || request()->get('type') == 'source'])->order(86);
+                    $menu->url(url('crm/dashboard'), __('crm::lang.crm'), ['icon' => 'fas fa fa-broadcast-tower', 'style' => config('app.env') == 'demo' ? 'background-color: #8CAFD4;' : '', 'active' => request()->segment(1) == 'crm' || request()->get('type') == 'life_stage' || request()->get('type') == 'source'])->order(86);
                 }
             );
 
