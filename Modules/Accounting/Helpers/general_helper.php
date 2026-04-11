@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Modules\Accounting\Entities\Contact;
 
-function accounting($ul, $pt, $lc, $em, $un, $type = 1, $pid = null)
-{
-	//bugs
+if (!function_exists('accounting')) {
+    function accounting($ul, $pt, $lc, $em, $un, $type = 1, $pid = null)
+    {
+	    //bugs
+    }
 }
 
 
