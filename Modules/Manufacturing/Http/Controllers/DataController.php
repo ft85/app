@@ -70,7 +70,7 @@ class DataController extends Controller
         if ($is_mfg_enabled && (auth()->user()->can('manufacturing.access_recipe') || auth()->user()->can('manufacturing.access_production'))) {
             Menu::modify('admin-sidebar-menu', function ($menu) {
                 $menu->url(
-                        action([\Modules\Manufacturing\Http\Controllers\RecipeController::class, 'index']),
+                        url('manufacturing/recipe'),
                         __('manufacturing::lang.manufacturing'),
                         ['icon' => 'fa fas fa-industry', 'style' => config('app.env') == 'demo' ? 'background-color: #ff851b;' : '', 'active' => request()->segment(1) == 'manufacturing']
                     )
