@@ -352,6 +352,7 @@ class TransactionUtil extends Util
             'discount_amount' => $uf_data ? $this->num_uf($input['discount_amount'] ?? 0) : ($input['discount_amount'] ?? 0),
             'tax_amount' => $invoice_total['tax'],
             'final_total' => $newfinaltotal,
+            'created_by' => $user_id,
             'is_created_from_api' => ! empty($input['is_created_from_api']) ? 1 : 0,
             'types_of_service_id' => ! empty($input['types_of_service_id']) ? $input['types_of_service_id'] : null,
             'packing_charge' => ! empty($input['packing_charge']) ? $input['packing_charge'] : 0,
@@ -1563,6 +1564,9 @@ class TransactionUtil extends Util
         $transaction = Transaction::find($transaction_id);
         $transaction_type = $transaction->type;
 
+        $is_paid = $transaction->payment_status == 'paid';
+        $is_credit_sale = in_array($transaction->payment_status, ['due', 'partial']);
+
         $output = [
             'header_text' => isset($il->header_text) ? $il->header_text : '',
             'business_name' => ($il->show_business_name == 1) ? $business_details->name : '',
@@ -1576,6 +1580,13 @@ class TransactionUtil extends Util
             'table_qty_label' => $il->table_qty_label,
             'table_unit_price_label' => $il->table_unit_price_label,
             'table_subtotal_label' => $il->table_subtotal_label,
+
+            'status' => $transaction->status,
+            'sub_status' => $transaction->sub_status,
+            'is_quotation' => (int) $transaction->is_quotation,
+            'payment_status' => $transaction->payment_status,
+            'is_paid' => $is_paid ? 1 : 0,
+            'is_credit_sale' => $is_credit_sale ? 1 : 0,
         ];
 
         //Display name

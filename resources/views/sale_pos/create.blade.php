@@ -113,7 +113,7 @@
 <link rel="stylesheet" href="{{ asset('css/pos-premium.css') }}?v={{ $asset_v }}">
 @stop
 @section('javascript')
-    <script src="{{ asset('js/pos.js?v=' . $asset_v) }}"></script>
+    <script src="{{ asset('js/pos.js?v=' . $asset_v . '&t=' . filemtime(public_path('js/pos.js')) ) }}"></script>
     <script src="{{ asset('js/printer.js?v=' . $asset_v) }}"></script>
     <script src="{{ asset('js/product.js?v=' . $asset_v) }}"></script>
     <script src="{{ asset('js/opening_stock.js?v=' . $asset_v) }}"></script>

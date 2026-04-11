@@ -1008,11 +1008,18 @@
     @endif
 
     <div class="title">
-        @if(isset($receipt_details->is_quotation) && ($receipt_details->is_quotation == 1 || $receipt_details->is_quotation === "1"))
+        @php
+            $is_quotation = (isset($receipt_details->is_quotation) && ($receipt_details->is_quotation == 1 || $receipt_details->is_quotation === '1'))
+                || (isset($receipt_details->sub_status) && $receipt_details->sub_status === 'quotation')
+                || (!empty($receipt_details->invoice_heading) && stripos($receipt_details->invoice_heading, 'quotation') !== false);
+
+            $is_credit = (isset($receipt_details->payment_status) && ($receipt_details->payment_status == 'due' || $receipt_details->payment_status == 'partial'))
+                || (isset($receipt_details->is_credit_sale) && ($receipt_details->is_credit_sale == 1 || $receipt_details->is_credit_sale === '1'));
+        @endphp
+
+        @if($is_quotation)
             QUOTATION
-        @elseif(isset($receipt_details->payment_status) && ($receipt_details->payment_status == 'due' || $receipt_details->payment_status == 'partial'))
-            FACTURE à Credit
-        @elseif(isset($receipt_details->is_credit_sale) && ($receipt_details->is_credit_sale == 1 || $receipt_details->is_credit_sale === "1"))
+        @elseif($is_credit)
             FACTURE à Credit
         @else
             FACTURE {{!empty($receipt_details->is_paid) ? 'PAYÉE' : ''}}

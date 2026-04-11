@@ -1,5 +1,17 @@
 var global_brand_id = null;
 var global_p_category_id = null;
+
+function pos_force_refresh(delay_ms) {
+    var delay = typeof delay_ms === 'number' ? delay_ms : 0;
+    setTimeout(function() {
+        if ($('input#pos_redirect_url').length > 0 && $('input#pos_redirect_url').val()) {
+            window.location = $('input#pos_redirect_url').val();
+        } else {
+            window.location.reload();
+        }
+    }, delay);
+}
+
 $(document).ready(function() {
     customer_set = false;
     //Prevent enter key function except texarea
@@ -676,6 +688,8 @@ $(document).ready(function() {
                 if (result.success) {
                     toastr.success(result.msg);
                     reset_pos_form();
+
+                    pos_force_refresh(1800);
                 } else {
                     toastr.error(result.msg);
                 }
@@ -733,6 +747,8 @@ $(document).ready(function() {
                     if (result.receipt.is_enabled) {
                         pos_print(result.receipt);
                     }
+
+                    pos_force_refresh(1800);
                 } else {
                     toastr.error(result.msg);
                 }
@@ -795,13 +811,16 @@ $(document).ready(function() {
     $('button.pos-express-finalize').click(function() {
         var $this = $(this);
 
-        // Disable the button to prevent multiple clicks
-        $this.prop('disabled', true);
+        // Prevent double click without permanently disabling the button
+        if ($this.data('processing') === 1) {
+            return false;
+        }
+        $this.data('processing', 1);
 
         // Check if product is present or not
         if ($('table#pos_table tbody').find('.product_row').length <= 0) {
             toastr.warning(LANG.no_products_added);
-            $this.prop('disabled', false);
+            $this.data('processing', 0);
             return false;
         }
 
@@ -809,7 +828,7 @@ $(document).ready(function() {
             var validate_rp = isValidatRewardPoint();
             if (!validate_rp['is_valid']) {
                 toastr.error(validate_rp['msg']);
-                $this.prop('disabled', false);
+                $this.data('processing', 0);
                 return false;
             }
         }
@@ -819,6 +838,11 @@ $(document).ready(function() {
         // If pay method is credit sale submit form
         if (pay_method == 'credit_sale') {
             $('#is_credit_sale').val(1);
+            if (pos_form_obj.valid && pos_form_obj.valid() !== true) {
+                $this.data('processing', 0);
+                return false;
+            }
+            disable_pos_form_actions();
             pos_form_obj.submit();
             return true;
         } else {
@@ -848,14 +872,25 @@ $(document).ready(function() {
         payment_method_dropdown.val(pay_method);
         payment_method_dropdown.change();
 
+        //Validate before submitting; otherwise the button can appear stuck.
+        if (pos_form_obj.valid && pos_form_obj.valid() !== true) {
+            $this.data('processing', 0);
+            return false;
+        }
+
         // Handle different payment methods
         if (pay_method == 'card') {
             $('div#card_details_modal').modal('show');
+            $this.data('processing', 0);
         } else if (pay_method == 'suspend') {
             $('div#confirmSuspendModal').modal('show');
+            $this.data('processing', 0);
         } else {
+            disable_pos_form_actions();
             pos_form_obj.submit();
         }
+
+        $this.data('processing', 0);
     });
 
     $('div#card_details_modal').on('shown.bs.modal', function(e) {
@@ -1022,6 +1057,8 @@ $(document).ready(function() {
                             if (result.receipt.is_enabled) {
                                 pos_print(result.receipt);
                             }
+
+                            pos_force_refresh(1800);
                         } else {
                             toastr.error(result.msg);
                         }
@@ -2219,7 +2256,7 @@ function reset_pos_form() {
     }
 
     //Status is hidden in sales order
-    if ($('#status').length > 0 && $('#status').is(':visible')) {
+    if ($('#status').length > 0) {
         $('#status').val('').trigger('change');
     }
     if ($('#transaction_date').length > 0) {
@@ -2378,6 +2415,10 @@ function pos_print(receipt) {
         $('#receipt_section').html(receipt.html_content);
         __currency_convert_recursively($('#receipt_section'));
         __print_receipt('receipt_section');
+
+        setTimeout(function() {
+            $('#receipt_section').empty();
+        }, 1500);
 
         setTimeout(function() {
             document.title = title;

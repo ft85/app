@@ -216,39 +216,6 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.getElementById('openOrdersModal').addEventListener('click', function() {
-        fetch('/user-line-orders')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
-            .then(data => {
-                // Insert the modal HTML into the modal body
-                document.getElementById('modalBodyContent').innerHTML = data;
-
-                // Remove aria-hidden when showing the modal
-                document.getElementById('ordersModal').setAttribute('aria-hidden', 'false');
-
-                // Show the modal
-                $('#ordersModal').modal('show');
-            })
-            .catch(error => {
-                console.error('There was an error fetching the data:', error);
-            });
-
-        // Listen for modal close and set aria-hidden back to true
-        $('#ordersModal').on('hidden.bs.modal', function() {
-            document.getElementById('ordersModal').setAttribute('aria-hidden', 'true');
-        });
-    });
-</script>
-<iframe id="print-frame" style="display:none;"></iframe>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
         // Function to load modal content
@@ -264,6 +231,11 @@
                 },
             });
         }
+
+        $(document).on('click', '#openOrdersModal', function(e) {
+            e.preventDefault();
+            $('#ordersModal').modal('show');
+        });
 
         // Initially load modal content when modal is opened
         $('#ordersModal').on('show.bs.modal', function() {
