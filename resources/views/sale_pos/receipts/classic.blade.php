@@ -26,41 +26,41 @@
       <div id="project">
         <div><strong>A. Identification du vendeur</strong></div>
         <div>Nom et prénom ou Raison sociale :
-          {{ $receipt_details->business_name ?? $receipt_details->display_name ?? ‘’ }}
+          {{ $receipt_details->business_name ?? $receipt_details->display_name ?? '' }}
         </div>
         <div>NIF :
         @if(!empty($receipt_details->tax_info1))
         {{ $receipt_details->tax_info1 }}
         @endif
         </div>
-        <div>Registre de Commerce N°{{ $receipt_details->registre_commerce ?? ‘’ }}</div>
+        <div>Registre de Commerce N°{{ $receipt_details->registre_commerce ?? '' }}</div>
         <div>Address :
-        {!! $receipt_details->address ?? ‘’ !!}
+        {!! $receipt_details->address ?? '' !!}
         </div>
-        <div>Centre fiscal : {{ $receipt_details->centre_fiscal ?? ‘’ }}</div>
-        <div>Secteur  d’activités : {{ $receipt_details->secteur ?? ‘’ }} </div>
-        <div>Forme juridique: {{ $receipt_details->forme ?? ‘’ }}</div>
+        <div>Centre fiscal : {{ $receipt_details->centre_fiscal ?? '' }}</div>
+        <div>Secteur  d'activités : {{ $receipt_details->secteur ?? '' }} </div>
+        <div>Forme juridique: {{ $receipt_details->forme ?? '' }}</div>
 @php
-    $tva_payer  = $receipt_details->tva_payer  ?? ‘0’;
-    $tc_payer   = $receipt_details->tc_payer   ?? ‘0’;
-    $pfa_payer  = $receipt_details->pfa_payer  ?? ‘0’;
+    $tva_payer  = $receipt_details->tva_payer  ?? '0';
+    $tc_payer   = $receipt_details->tc_payer   ?? '0';
+    $pfa_payer  = $receipt_details->pfa_payer  ?? '0';
 @endphp
 <div>Assujetti à la TVA :
-    <input type="checkbox" id="TVA" name="TVA" {{ $tva_payer == ‘1’ ? ‘checked’ : ‘’ }}>
+    <input type="checkbox" id="TVA" name="TVA" {{ $tva_payer == '1' ? 'checked' : '' }}>
     <label for="TVA">Oui</label>
-    <input type="checkbox" id="HTVA" name="HTVA" {{ $tva_payer != ‘1’ ? ‘checked’ : ‘’ }}>
+    <input type="checkbox" id="HTVA" name="HTVA" {{ $tva_payer != '1' ? 'checked' : '' }}>
     <label for="HTVA">Non</label>
 </div>
 <div> Assujetti à la TC :
-    <input type="checkbox" id="TVA" name="TVA" {{ $tc_payer == ‘1’ ? ‘checked’ : ‘’ }}>
+    <input type="checkbox" id="TVA" name="TVA" {{ $tc_payer == '1' ? 'checked' : '' }}>
     <label for="TVA">Oui</label>
-    <input type="checkbox" id="HTVA" name="HTVA" {{ $tc_payer != ‘1’ ? ‘checked’ : ‘’ }}>
+    <input type="checkbox" id="HTVA" name="HTVA" {{ $tc_payer != '1' ? 'checked' : '' }}>
     <label for="HTVA">Non</label>
 </div>
 <div>Assujetti à la PFA :
-    <input type="checkbox" id="TVA" name="TVA" {{ $pfa_payer == ‘1’ ? ‘checked’ : ‘’ }}>
+    <input type="checkbox" id="TVA" name="TVA" {{ $pfa_payer == '1' ? 'checked' : '' }}>
     <label for="TVA">Oui</label>
-    <input type="checkbox" id="HTVA" name="HTVA" {{ $pfa_payer != ‘1’ ? ‘checked’ : ‘’ }}>
+    <input type="checkbox" id="HTVA" name="HTVA" {{ $pfa_payer != '1' ? 'checked' : '' }}>
     <label for="HTVA">Non</label>
 </div>
 	  </div>
