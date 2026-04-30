@@ -294,6 +294,7 @@ class CurrenciesTableSeeder extends Seeder
             ['country' => 'Angola', 'currency' => 'Kwanza', 'code' => 'AOA', 'symbol' => 'Kz', 'thousand_separator' => ',', 'decimal_separator' => '.', 'created_at' => null, 'updated_at' => null],
             ['country' => 'Kuwait', 'currency' => 'Kuwaiti dinar', 'code' => 'KWD', 'symbol' => 'KD', 'thousand_separator' => ',', 'decimal_separator' => '.', 'created_at' => null, 'updated_at' => null],
             ['country' => 'Bahrain', 'currency' => 'Bahraini dinar', 'code' => 'BHD', 'symbol' => 'BD', 'thousand_separator' => ',', 'decimal_separator' => '.', 'created_at' => null, 'updated_at' => null],
+            ['country' => 'Burundi', 'currency' => 'Burundian Franc', 'code' => 'BIF', 'symbol' => 'FBu', 'thousand_separator' => ',', 'decimal_separator' => '.', 'created_at' => null, 'updated_at' => null],
         ]);
     }
 }
