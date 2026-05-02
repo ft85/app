@@ -454,7 +454,7 @@ $(document).ready(function() {
         }
     
         // Update the line total
-        line_total = Math.ceil(line_total).toFixed(2);
+        line_total = parseFloat(line_total.toFixed(2));
     
         // Write the updated value back to the input field
         __write_number(tr.find('input.pos_line_total'), line_total, false, 2);
